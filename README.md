@@ -2,3 +2,4 @@
 
 Include: httpd ver 2.4 + wget + PHP versions + n98-magerun.phar + composer
 
+Configurate Apache module run with Magento Framework
