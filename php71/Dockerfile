@@ -6,7 +6,7 @@ RUN yum -y --setopt=tsflags=nodocs install httpd && yum clean all
 RUN yum -y install wget
 RUN yum install -y http://dl.iuscommunity.org/pub/ius/stable/CentOS/7/x86_64/ius-release-1.0-14.ius.centos7.noarch.rpm
 RUN yum -y install php71u php71u-pdo php71u-mysqlnd php71u-opcache php71u-xml php71u-mcrypt php71u-gd php71u-devel \
-                   php71u-mysql php71u-intl php71u-mbstring php71u-bcmath php71u-json php71u-iconv php71u-soap
+                   php71u-intl php71u-mbstring php71u-bcmath php71u-json php71u-iconv php71u-soap
 # Clean CentOS 7
 RUN yum clean all
 # Install Magerun
