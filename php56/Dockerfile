@@ -2,14 +2,13 @@ FROM centos:7.4.1708
 
 MAINTAINER Soulblade "phuocvu@builtwithdigital.com"
 
-RUN yum -y --setopt=tsflags=nodocs install httpd && yum clean all
-RUN yum -y install wget 
+RUN yum -y --setopt=tsflags=nodocs install httpd wget mysql vi crontabs && rm -rf /var/cache/yum/* && yum clean all
 RUN yum -y install install epel-release
 RUN wget https://centos7.iuscommunity.org/ius-release.rpm && rpm -Uvh ius-release*.rpm
-RUN yum -y install php56u php56u-soap php56u-xml php56u-pdo php56u-mcrypt php56u-mbstring php56u-mysqlnd \
-            php56u-gd php56u-cli php56u-bcmath php56u-pecl-imagick php56u-pecl-redis php56u-intl php56u-pear
+RUN yum -y install php56u php56u-soap php56u-xml php56u-pdo php56u-mcrypt php56u-mbstring php56u-mysqlnd php56u-cli \
+           php56u-gd php56u-bcmath php56u-pecl-imagick php56u-pecl-redis php56u-intl php56u-pear 
 # Clean CentOS 7
-RUN yum clean all
+RUN yum clean all && rm -rf /var/cache/yum/*
 # Install Magerun
 RUN wget https://files.magerun.net/n98-magerun.phar && chmod +x ./n98-magerun.phar && mv ./n98-magerun.phar /usr/bin/
 # Install composer
@@ -50,4 +49,4 @@ WORKDIR /var/www/html
 ADD run-httpd.sh /run-httpd.sh
 RUN chmod -v +x /run-httpd.sh
 
-CMD ["/run-httpd.sh"]
+CMD ["/run-httpd.sh", "/usr/sbin/crond"]

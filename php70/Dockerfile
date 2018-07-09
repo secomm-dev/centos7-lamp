@@ -2,13 +2,12 @@ FROM centos:7.4.1708
 
 MAINTAINER Soulblade "phuocvu@builtwithdigital.com"
 
-RUN yum -y --setopt=tsflags=nodocs install httpd && yum clean all
-RUN yum -y install wget
+RUN yum -y --setopt=tsflags=nodocs install httpd wget mysql vi crontabs && rm -rf /var/cache/yum/* && yum clean all
 RUN yum install -y http://dl.iuscommunity.org/pub/ius/stable/CentOS/7/x86_64/ius-release-1.0-14.ius.centos7.noarch.rpm
 RUN yum -y install php70u php70u-pdo php70u-mysqlnd php70u-opcache php70u-xml php70u-mcrypt php70u-gd php70u-devel \
                    php70u-intl php70u-mbstring php70u-bcmath php70u-json php70u-iconv php70u-soap
 # Clean CentOS 7
-RUN yum clean all
+RUN yum clean all && rm -rf /var/cache/yum/* 
 # Install Magerun
 RUN wget https://files.magerun.net/n98-magerun.phar && chmod +x ./n98-magerun.phar && mv ./n98-magerun.phar /usr/bin/
 # Install composer
@@ -40,16 +39,15 @@ RUN sed -i 's/LoadModule proxy_connect_module/#LoadModule proxy_connect_module/g
 RUN sed -i 's/LoadModule proxy_ftp_module/#LoadModule proxy_ftp_module/g' /etc/httpd/conf.modules.d/00-proxy.conf
 RUN sed -i 's/LoadModule proxy_http_module/#LoadModule proxy_http_module/g' /etc/httpd/conf.modules.d/00-proxy.conf
 
-#EXPOSE 80 443
+# Copy settings
+#COPY php.d/ /etc/php.d/
+#RUN IP=$(/sbin/ip route|awk '/default/ { print $3 }'); echo -n "xdebug.remote_connect_back=Off\nxdebug.remote_host='${IP}'" >> /etc/php.d/15-xdebug.ini
 
 VOLUME ["/var/www/html", "/etc/httpd/conf.d/", "/var/log/httpd/"]
 WORKDIR /var/www/html
-
-#ENTRYPOINT [ "/usr/sbin/httpd" ]
-#CMD ["httpd", "-DFOREGROUND", "bash"]
 
 # Simple startup script to avoid some issues observed with container restart
 ADD run-httpd.sh /run-httpd.sh
 RUN chmod -v +x /run-httpd.sh
 
-CMD ["/run-httpd.sh"]
+CMD ["/run-httpd.sh", "/usr/sbin/crond"]

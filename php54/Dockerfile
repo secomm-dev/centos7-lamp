@@ -2,12 +2,11 @@ FROM centos:7.4.1708
 
 MAINTAINER Soulblade "phuocvu@builtwithdigital.com"
 
-RUN yum -y --setopt=tsflags=nodocs install httpd && yum clean all
-RUN yum -y install wget
+RUN yum -y --setopt=tsflags=nodocs install httpd wget mysql vi crontabs && rm -rf /var/cache/yum/* && yum clean all
 RUN yum -y install php php-soap php-xml php-pdo php-mcrypt php-mbstring php-mysqlnd php-pear \
-                   php-gd php-cli php-bcmath php-pecl-imagick php-pecl-redis php-intl 
+        php-gd php-cli php-bcmath php-pecl-imagick php-pecl-redis php-intl 
 # Clean CentOS 7
-RUN yum clean all
+RUN yum clean all && rm -rf /var/cache/yum/* 
 # Install Magerun
 RUN wget https://files.magerun.net/n98-magerun.phar && chmod +x ./n98-magerun.phar && mv ./n98-magerun.phar /usr/bin/
 # Install composer
@@ -17,6 +16,7 @@ RUN sed -i 's/memory_limit = 128M/memory_limit = 512M/g' /etc/php.ini
 RUN sed -i 's/post_max_size = 8M/post_max_size = 256M/g' /etc/php.ini
 RUN sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 256M/g' /etc/php.ini
 RUN sed -i 's/short_open_tag = Off/short_open_tag = On/g' /etc/php.ini
+RUN sed -i 's/max_execution_time = 60/max_execution_time = 300/g' /etc/php.ini
 # Config apache
 RUN sed -i 's/LoadModule authn_anon_module/#LoadModule authn_anon_module/g' /etc/httpd/conf.modules.d/00-base.conf
 RUN sed -i 's/LoadModule authn_dbm_module/#LoadModule authn_dbm_module/g' /etc/httpd/conf.modules.d/00-base.conf
@@ -44,11 +44,9 @@ RUN sed -i 's/LoadModule proxy_http_module/#LoadModule proxy_http_module/g' /etc
 VOLUME ["/var/www/html", "/etc/httpd/conf.d/", "/var/log/httpd/"]
 WORKDIR /var/www/html
 
-#ENTRYPOINT [ "/usr/sbin/httpd" ]
-#CMD ["-DFOREGROUND", "bash"]
 
 # Simple startup script to avoid some issues observed with container restart
 ADD run-httpd.sh /run-httpd.sh
 RUN chmod -v +x /run-httpd.sh
 
-CMD ["/run-httpd.sh"]
+CMD ["/run-httpd.sh", "/usr/sbin/crond"]

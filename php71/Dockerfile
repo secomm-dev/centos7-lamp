@@ -2,13 +2,12 @@ FROM centos:7.4.1708
 
 MAINTAINER Soulblade "phuocvu@builtwithdigital.com"
 
-RUN yum -y --setopt=tsflags=nodocs install httpd && yum clean all
-RUN yum -y install wget
+RUN yum -y --setopt=tsflags=nodocs install httpd wget mysql vi crontabs && rm -rf /var/cache/yum/* && yum clean all
 RUN yum install -y http://dl.iuscommunity.org/pub/ius/stable/CentOS/7/x86_64/ius-release-1.0-14.ius.centos7.noarch.rpm
 RUN yum -y install php71u php71u-pdo php71u-mysqlnd php71u-opcache php71u-xml php71u-mcrypt php71u-gd php71u-devel \
                    php71u-intl php71u-mbstring php71u-bcmath php71u-json php71u-iconv php71u-soap
 # Clean CentOS 7
-RUN yum clean all
+RUN yum clean all && rm -rf /var/cache/yum/* 
 # Install Magerun
 RUN wget https://files.magerun.net/n98-magerun.phar && chmod +x ./n98-magerun.phar && mv ./n98-magerun.phar /usr/bin/
 # Install composer
@@ -50,4 +49,4 @@ WORKDIR /var/www/html
 ADD run-httpd.sh /run-httpd.sh
 RUN chmod -v +x /run-httpd.sh
 
-CMD ["/run-httpd.sh"]
+CMD ["/run-httpd.sh", "/usr/sbin/crond"]
