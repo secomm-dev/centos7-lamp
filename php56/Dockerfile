@@ -2,7 +2,7 @@ FROM centos:7.4.1708
 
 MAINTAINER Soulblade "phuocvu@builtwithdigital.com"
 
-RUN yum -y --setopt=tsflags=nodocs install httpd wget mysql vi crontabs && rm -rf /var/cache/yum/* && yum clean all
+RUN yum -y --setopt=tsflags=nodocs install httpd wget mysql vi crontabs unzip sudo 
 RUN yum -y install install epel-release
 RUN wget https://centos7.iuscommunity.org/ius-release.rpm && rpm -Uvh ius-release*.rpm
 RUN yum -y install php56u php56u-soap php56u-xml php56u-pdo php56u-mcrypt php56u-mbstring php56u-mysqlnd php56u-cli \
@@ -39,6 +39,10 @@ RUN sed -i 's/LoadModule proxy_balancer_module/#LoadModule proxy_balancer_module
 RUN sed -i 's/LoadModule proxy_connect_module/#LoadModule proxy_connect_module/g' /etc/httpd/conf.modules.d/00-proxy.conf
 RUN sed -i 's/LoadModule proxy_ftp_module/#LoadModule proxy_ftp_module/g' /etc/httpd/conf.modules.d/00-proxy.conf
 RUN sed -i 's/LoadModule proxy_http_module/#LoadModule proxy_http_module/g' /etc/httpd/conf.modules.d/00-proxy.conf
+# Create sudo user
+RUN adduser -d /home/web web
+RUN usermod -aG root web && usermod -aG apache web
+RUN echo "web      ALL=(ALL)       ALL" >> /etc/sudoers
 
 #EXPOSE 80 443
 
