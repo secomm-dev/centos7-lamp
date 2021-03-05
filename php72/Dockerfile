@@ -2,7 +2,7 @@ FROM centos:7
 
 MAINTAINER Soulblade "phuocvu@builtwithdigital.com"
 
-RUN yum -y --setopt=tsflags=nodocs install httpd wget mysql vi crontabs unzip sudo sendmail git zip openssh-client \
+RUN yum -y --setopt=tsflags=nodocs install httpd wget mysql vi crontabs unzip sudo sendmail git zip \
  && yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
  && yum -y install https://rpms.remirepo.net/enterprise/remi-release-7.rpm \
  && yum-config-manager --enable remi-php72 \
